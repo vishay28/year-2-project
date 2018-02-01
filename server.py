@@ -12,7 +12,7 @@ def getTime():
     #Returning the current date and time
     return currentTime
 
-#Asking the user to set up the server by typing in the ip
+#Asking the user to set up the server by typing in the ip. (USE "localhost" if you are running both programs on the same computer)
 print("Input the server ip")
 #Getting the user input for the ip
 ip = input()
