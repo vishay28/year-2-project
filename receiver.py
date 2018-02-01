@@ -12,12 +12,12 @@ def getTime():
     #Returning the current date and time
     return currentTime
 
-#Asking the user to set up the server by typing in the ip. (USE "localhost" if you are running both programs on the same computer)
+#Asking the user to input the ip of the server it is trying to connect to. (USE "localhost" if you are running both programs on the same computer)
 print("Input the server ip")
 #Getting the user input for the ip
 ip = input()
 
-#Asking the user to input a port for the server
+#Asking the user to input the port of the server it is trying to connect to
 print("Input the port")
 #Getting the user input for the port and then coverting it to an integer
 port = int(input())
