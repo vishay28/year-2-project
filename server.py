@@ -2,6 +2,9 @@
 import socket
 #Imports a package to get the current date and time for timestamping
 import datetime
+from threading import Thread
+
+clientMessage = ""
 
 #Creating a function to get the current date and time and formatting it
 def getTime():
@@ -12,42 +15,102 @@ def getTime():
     #Returning the current date and time
     return currentTime
 
-#Asking the user to set up the server by typing in the ip. (USE "localhost" if you are running both programs on the same computer)
-print("Input the server ip")
-#Getting the user input for the ip
-ip = input()
+def determineDeviceType(clientID, client, clientAddress):
+    global switchClient
+    global plugClient
+    if deviceType == "switch":
+        print(getTime() + "Connected to switch " + str(clientAddress))
+        switchClient = client
+    elif deviceType == "plug":
+        print(getTime() + "Connected to plug " + str(clientAddress))
+        plugClient = client
+    elif deviceType == "user":
+        print(getTime() + "Connected to user " + str(clientAddress))
+        userClient = client
 
-#Asking the user to input a port for the server
-print("Input the port")
-#Getting the user input for the port and then coverting it to an integer
-port = int(input())
+def switchControl():
+    global clientMessage
 
-#Defining a variable in which to open a socket
-server = socket.socket()
-#Binding the server socket to the ip and port
-server.bind((ip,port))
+    while True:
+        clientMessage = switchClient.recv(1024)
+        clientMessage = clientMessage.decode()
 
-#Getting the server to listen for a device to connect to it
-server.listen(1)
+        if clientMessage == "switchOn":
+            print(getTime() + "Switch turned on")
+            print(getTime() + "Plug turned on")
+            sendMessage = "turnOn"
+            plugClient.send(sendMessage.encode())
+            clientMessage = ""
+        elif clientMessage == "switchOff":
+            print(getTime() + "Switch turned off")
+            print(getTime() + "Plug turned off")
+            sendMessage = "turnOff"
+            plugClient.send(sendMessage.encode())
+            clientMessage = ""
 
-#Defining the connected device and accepting the connection
-receiver, address = server.accept()
+def userControl():
+    global clientMessage
 
-#Printing a log of the date and time and the device that the server has connected to
-print(getTime() + "Connected to " + str(address))
+    while True:
+        clientMessage = switchClient.recv(1024)
+        clientMessage = clientMessage.decode()
 
-#Setting the value for the incoming message to None/Null
-message = None
+        if clientMessage == "switchOn":
+            print(getTime() + "Switch turned on")
+            print(getTime() + "Plug turned on")
+            sendMessage = "turnOn"
+            plugClient.send(sendMessage.encode())
+            clientMessage = ""
+        elif clientMessage == "switchOff":
+            print(getTime() + "Switch turned off")
+            print(getTime() + "Plug turned off")
+            sendMessage = "turnOff"
+            plugClient.send(sendMessage.encode())
+            clientMessage = ""
 
-#Creating a main loop for the program to listen for incoming messages and respond accordingly
-while True:
-    #Assigning the variable message to the whatever message has been received
-    message = receiver.recv(1024)
-    #Decoding the message
-    message = message.decode()
-    
-    #Determining what the message wants the server to do
-    if message == "on":
-        print(getTime() + "Light turned on")
-    if message == "off":
-        print(getTime() + "Light turned off")
+
+
+if __name__ == "__main__":
+    #Asking the user to set up the server by typing in the ip. (USE "localhost" if you are running both programs on the same computer)
+    print("Input the server ip")
+    #Getting the user input for the ip
+    ip = input()
+
+    #Asking the user to input a port for the server
+    print("Input the port")
+    #Getting the user input for the port and then coverting it to an integer
+    port = int(input())
+
+    #Defining a variable in which to open a socket
+    server = socket.socket()
+    #Binding the server socket to the ip and port
+    server.bind((ip,port))
+
+    #Getting the server to listen for a device to connect to it
+    server.listen(1)
+    client1, client1Address = server.accept()
+    deviceType = client1.recv(1024)
+    deviceType = deviceType.decode()
+    determineDeviceType(deviceType, client1, client1Address)
+
+
+    server.listen(1)
+    client2, client2Address = server.accept()
+    deviceType = client2.recv(1024)
+    deviceType = deviceType.decode()
+    determineDeviceType(deviceType, client2, client2Address)
+
+    server.listen(1)
+    client3, client2Address = server.accept()
+    deviceType = client3.recv(1024)
+    deviceType = deviceType.decode()
+    determineDeviceType(deviceType, client3, client3Address)
+
+    switchThread = Thread(target=switchControl)
+    userThread = Thread(target=userControl)
+
+    switchThread.start()
+    userThread.start()
+
+    switchThread.join()
+    userThread.join()
