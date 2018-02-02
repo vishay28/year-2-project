@@ -48,3 +48,12 @@ if __name__ == "__main__":
         elif userInput == "off":
             message = "switchOff"
             server.send(message.encode())
+        elif userInput == "red":
+            message = "red"
+            server.send(message.encode())
+        elif userInput == "blue":
+            message = "blue"
+            server.send(message.encode())
+        elif userInput == "green":
+            message = "green"
+            server.send(message.encode())
