@@ -17,13 +17,14 @@ def getTime():
 
 def determineDeviceType(clientID, client, clientAddress):
     global switchClient
-    global plugClient
+    global lightClient
+    global userClient
     if deviceType == "switch":
         print(getTime() + "Connected to switch " + str(clientAddress))
         switchClient = client
-    elif deviceType == "plug":
-        print(getTime() + "Connected to plug " + str(clientAddress))
-        plugClient = client
+    elif deviceType == "light":
+        print(getTime() + "Connected to light " + str(clientAddress))
+        lightClient = client
     elif deviceType == "user":
         print(getTime() + "Connected to user " + str(clientAddress))
         userClient = client
@@ -37,36 +38,49 @@ def switchControl():
 
         if clientMessage == "switchOn":
             print(getTime() + "Switch turned on")
-            print(getTime() + "Plug turned on")
+            print(getTime() + "Light turned on")
             sendMessage = "turnOn"
-            plugClient.send(sendMessage.encode())
+            lightClient.send(sendMessage.encode())
             clientMessage = ""
         elif clientMessage == "switchOff":
             print(getTime() + "Switch turned off")
-            print(getTime() + "Plug turned off")
+            print(getTime() + "Light turned off")
             sendMessage = "turnOff"
-            plugClient.send(sendMessage.encode())
+            lightClient.send(sendMessage.encode())
             clientMessage = ""
 
 def userControl():
     global clientMessage
 
     while True:
-        clientMessage = switchClient.recv(1024)
+        clientMessage = ""
+        sendMessage = ""
+        clientMessage = userClient.recv(1024)
         clientMessage = clientMessage.decode()
 
         if clientMessage == "switchOn":
             print(getTime() + "Switch turned on")
-            print(getTime() + "Plug turned on")
+            print(getTime() + "Light turned on")
             sendMessage = "turnOn"
-            plugClient.send(sendMessage.encode())
-            clientMessage = ""
+            lightClient.send(sendMessage.encode())
         elif clientMessage == "switchOff":
             print(getTime() + "Switch turned off")
-            print(getTime() + "Plug turned off")
+            print(getTime() + "Light turned off")
             sendMessage = "turnOff"
-            plugClient.send(sendMessage.encode())
-            clientMessage = ""
+            lightClient.send(sendMessage.encode())
+        elif clientMessage == "red":
+            print(getTime() + "Light turned to red")
+            sendMessage = "red"
+            lightClient.send(sendMessage.encode())
+        elif clientMessage == "blue":
+            print(getTime() + "Light turned to blue")
+            sendMessage = "blue"
+            lightClient.send(sendMessage.encode())
+        elif clientMessage == "green":
+            print(getTime() + "Light turned to green")
+            sendMessage = "green"
+            lightClient.send(sendMessage.encode())
+
 
 
 
@@ -101,7 +115,7 @@ if __name__ == "__main__":
     determineDeviceType(deviceType, client2, client2Address)
 
     server.listen(1)
-    client3, client2Address = server.accept()
+    client3, client3Address = server.accept()
     deviceType = client3.recv(1024)
     deviceType = deviceType.decode()
     determineDeviceType(deviceType, client3, client3Address)
