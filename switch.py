@@ -14,6 +14,10 @@ def getTime():
     #Returning the current date and time
     return currentTime
 
+def serverMessageSend(message):
+    server.send(message.encode())
+
+
 
 if __name__ == "__main__":
     #Asking the user to input the ip of the server it is trying to connect to. (USE "localhost" if you are running both programs on the same computer)
@@ -43,8 +47,6 @@ if __name__ == "__main__":
         message = ""
         userInput = input()
         if userInput == "on":
-            message = "switchOn"
-            server.send(message.encode())
+            serverMessageSend("switchOn")
         elif userInput == "off":
-            message = "switchOff"
-            server.send(message.encode())
+            serverMessageSend("switchOff")
