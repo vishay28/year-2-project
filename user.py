@@ -25,6 +25,9 @@ def serverListen():
             print(getTime() + "Light connected")
             serverMessage = ""
 
+def serverMessageSend(message):
+    server.send(message.encode())
+
 if __name__ == "__main__":
     #Asking the user to input the ip of the server it is trying to connect to. (USE "localhost" if you are running both programs on the same computer)
     print("Input the server ip")
@@ -56,29 +59,20 @@ if __name__ == "__main__":
         message = ""
         userInput = input()
         if userInput == "on":
-            message = "switchOn"
-            server.send(message.encode())
+            serverMessageSend("switchOn")
         elif userInput == "off":
-            message = "switchOff"
-            server.send(message.encode())
+            serverMessageSend("switchOff")
         elif userInput == "red":
-            message = "red"
-            server.send(message.encode())
+            serverMessageSend(userInput)
         elif userInput == "blue":
-            message = "blue"
-            server.send(message.encode())
+            serverMessageSend(userInput)
         elif userInput == "green":
-            message = "green"
-            server.send(message.encode())
+            serverMessageSend(userInput)
         elif userInput == "purple":
-            message = "purple"
-            server.send(message.encode())
+            serverMessageSend(userInput)
         elif userInput == "yellow":
-            message = "yellow"
-            server.send(message.encode())
+            serverMessageSend(userInput)
         elif userInput == "cyan":
-            message = "cyan"
-            server.send(message.encode())
+            serverMessageSend(userInput)
         elif userInput == "white":
-            message = "white"
-            server.send(message.encode())
+            serverMessageSend(userInput)
