@@ -23,6 +23,36 @@ def serverListen():
         serverMessage = server.recv(1024)
         serverMessage = serverMessage.decode()
 
+def rememberColour(colour):
+    global redColour
+    global blueColour
+    global greenColour
+    global purpleColour
+    global yellowColour
+    global cyanColour
+    global whiteColour
+    redColour = False
+    blueColour = False
+    greenColour = False
+    purpleColour = False
+    yellowColour = False
+    cyanColour = False
+    whiteColour = False
+    if colour == "red":
+        redColour = True
+    elif colour == "blue":
+        blueColour = True
+    elif colour == "green":
+        greenColour = True
+    elif colour == "purple":
+        purpleColour = True
+    elif colour == "yellow":
+        yellowColour = True
+    elif colour == "cyan":
+        cyanColour = True
+    elif colour == "white":
+        whiteColour = True
+
 
 
 if __name__ == "__main__":
@@ -55,36 +85,86 @@ if __name__ == "__main__":
     serverListenThread = Thread(target=serverListen)
     serverListenThread.start()
 
+    redColour = False
+    blueColour = False
+    greenColour = False
+    purpleColour = False
+    yellowColour = False
+    cyanColour = False
+    whiteColour = True
+
     while True:
         if serverMessage == "turnOn":
             print(getTime() + "Light turned on")
-            GPIO.output(3, GPIO.HIGH)
-            GPIO.output(5, GPIO.HIGH)
-            GPIO.output(7, GPIO.HIGH)
-            serverMessage = ""
+            if redColour == True:
+                serverMessage = "red"
+            elif blueColour == True:
+                serverMessage = "blue"
+            elif greenColour == True:
+                serverMessage = "green"
+            elif purpleColour == True:
+                serverMessage = "purple"
+            elif yellowColour == True:
+                serverMessage = "yellow"
+            elif cyanColour == True:
+                serverMessage = "cyan"
+            elif whiteColour == True:
+                serverMessage = "white"
         elif serverMessage == "turnOff":
             print(getTime() + "Light turned off")
             GPIO.output(3, GPIO.LOW)
             GPIO.output(5, GPIO.LOW)
             GPIO.output(7, GPIO.LOW)
             serverMessage = ""
-        elif serverMessage == "red":
+        if serverMessage == "red":
             print(getTime() + "Light switched to red")
-            GPIO.output(3, GPIO.High)
+            GPIO.output(3, GPIO.HIGH)
             GPIO.output(5, GPIO.LOW)
             GPIO.output(7, GPIO.LOW)
+            rememberColour("red")
             serverMessage = ""
-        elif serverMessage == "blue"
+        elif serverMessage == "blue":
             print(getTime() + "Light switched to blue")
             GPIO.output(3, GPIO.LOW)
             GPIO.output(5, GPIO.HIGH)
             GPIO.output(7, GPIO.LOW)
+            rememberColour("blue")
             serverMessage = ""
-        elif serverMessage == "green"
+        elif serverMessage == "green":
             print(getTime() + "Light switched to green")
             GPIO.output(3, GPIO.LOW)
             GPIO.output(5, GPIO.LOW)
             GPIO.output(7, GPIO.HIGH)
+            rememberColour("green")
+            serverMessage = ""
+        elif serverMessage == "purple":
+            print(getTime() + "Light switched to purple")
+            GPIO.output(3, GPIO.HIGH)
+            GPIO.output(5, GPIO.HIGH)
+            GPIO.output(7, GPIO.LOW)
+            rememberColour("purple")
+            serverMessage = ""
+        elif serverMessage == "yellow":
+            print(getTime() + "Light switched to yellow")
+            GPIO.output(3, GPIO.HIGH)
+            GPIO.output(5, GPIO.LOW)
+            GPIO.output(7, GPIO.HIGH)
+            rememberColour("yellow")
+            serverMessage = ""
+        elif serverMessage == "cyan":
+            print(getTime() + "Light switched to cyan")
+            GPIO.output(3, GPIO.LOW)
+            GPIO.output(5, GPIO.HIGH)
+            GPIO.output(7, GPIO.HIGH)
+            rememberColour("cyan")
+            cyanColour = True
+            serverMessage = ""
+        elif serverMessage == "white":
+            print(getTime() + "Light switched to white")
+            GPIO.output(3, GPIO.HIGH)
+            GPIO.output(5, GPIO.HIGH)
+            GPIO.output(7, GPIO.HIGH)
+            rememberColour("white")
             serverMessage = ""
 
     serverListenThread.join()
