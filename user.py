@@ -14,6 +14,16 @@ def getTime():
     #Returning the current date and time
     return currentTime
 
+def serverListen():
+    while True:
+        serverMessage = server.recv(1024)
+        serverMessage = serverMessage.decode()
+        if serverMessage == "lightError":
+            print(getTime() + "Light disconnected")
+            serverMessage = ""
+        elif serverMessage == "lightConnected":
+            print(getTime() + "Light connected")
+            serverMessage = ""
 
 if __name__ == "__main__":
     #Asking the user to input the ip of the server it is trying to connect to. (USE "localhost" if you are running both programs on the same computer)
@@ -34,6 +44,9 @@ if __name__ == "__main__":
 
     #Once successfully connected it prints a log of the date and time and the ip it has connected to
     print(getTime() + "Connected to " + ip)
+
+    serverListenThread = Thread(target=serverListen)
+    serverListenThread.start()
 
     clientID = "user"
     server.send(clientID.encode())
@@ -56,4 +69,16 @@ if __name__ == "__main__":
             server.send(message.encode())
         elif userInput == "green":
             message = "green"
+            server.send(message.encode())
+        elif userInput == "purple":
+            message = "purple"
+            server.send(message.encode())
+        elif userInput == "yellow":
+            message = "yellow"
+            server.send(message.encode())
+        elif userInput == "cyan":
+            message = "cyan"
+            server.send(message.encode())
+        elif userInput == "white":
+            message = "white"
             server.send(message.encode())
