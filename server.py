@@ -2,6 +2,7 @@
 import socket
 #Imports a package to get the current date and time for timestamping
 import datetime
+import time
 from threading import Thread
 
 clientMessage = ""
@@ -15,72 +16,151 @@ def getTime():
     #Returning the current date and time
     return currentTime
 
+def sendLightActive():
+    global lightMessageDisplayed
+    while True:
+        try:
+            time.sleep(1)
+            sendMessage = "active"
+            lightClient.send(sendMessage.encode())
+        except NameError:
+            pass
+        except ConnectionAbortedError:
+            try:
+                if lightMessageDisplayed == False:
+                    sendMessage = "lightError"
+                    print(getTime() + "Light disconnected")
+                    lightMessageDisplayed = True
+                    userClient.send(sendMessage.encode())
+                    sendMessage=""
+            except ConnectionResetError:
+                pass
+            pass
+
+def listenForDevice():
+    global deviceType
+    #Getting the server to listen for a device to connect to it
+    while True:
+        server.listen(1)
+        client1, client1Address = server.accept()
+        deviceType = client1.recv(1024)
+        deviceType = deviceType.decode()
+        determineDeviceType(deviceType, client1, client1Address)
+
 def determineDeviceType(clientID, client, clientAddress):
+    global deviceType
     global switchClient
     global lightClient
     global userClient
+    global lightMessageDisplayed
+    global userMessageDisplayed
+    global switchMessageDisplayed
     if deviceType == "switch":
         print(getTime() + "Connected to switch " + str(clientAddress))
         switchClient = client
+        switchMessageDisplayed = False
     elif deviceType == "light":
         print(getTime() + "Connected to light " + str(clientAddress))
         lightClient = client
+        lightMessageDisplayed = False
+        try:
+            sendMessage=("lightConnected")
+            userClient.send(sendMessage.encode())
+        except (NameError, ConnectionResetError):
+            pass
     elif deviceType == "user":
         print(getTime() + "Connected to user " + str(clientAddress))
         userClient = client
+        userMessageDisplayed = False
 
 def switchControl():
     global clientMessage
+    global switchMessageDisplayed
 
     while True:
-        clientMessage = switchClient.recv(1024)
-        clientMessage = clientMessage.decode()
+        try:
+            time.sleep(0.5)
+            clientMessage = switchClient.recv(1024)
+            clientMessage = clientMessage.decode()
 
-        if clientMessage == "switchOn":
-            print(getTime() + "Switch turned on")
-            print(getTime() + "Light turned on")
-            sendMessage = "turnOn"
-            lightClient.send(sendMessage.encode())
-            clientMessage = ""
-        elif clientMessage == "switchOff":
-            print(getTime() + "Switch turned off")
-            print(getTime() + "Light turned off")
-            sendMessage = "turnOff"
-            lightClient.send(sendMessage.encode())
-            clientMessage = ""
+            if clientMessage == "switchOn":
+                print(getTime() + "Switch turned on")
+                print(getTime() + "Light turned on")
+                sendMessage = "turnOn"
+                lightClient.send(sendMessage.encode())
+                clientMessage = ""
+            elif clientMessage == "switchOff":
+                print(getTime() + "Switch turned off")
+                print(getTime() + "Light turned off")
+                sendMessage = "turnOff"
+                lightClient.send(sendMessage.encode())
+                clientMessage = ""
+        except NameError:
+            pass
+        except ConnectionResetError:
+            if switchMessageDisplayed == False:
+                print(getTime() + "Switch disconnected")
+                switchMessageDisplayed = True
+            pass
 
 def userControl():
     global clientMessage
-
+    global userMessageDisplayed
     while True:
-        clientMessage = ""
-        sendMessage = ""
-        clientMessage = userClient.recv(1024)
-        clientMessage = clientMessage.decode()
+        try:
+            clientMessage = ""
+            sendMessage = ""
+            clientMessage = userClient.recv(1024)
+            clientMessage = clientMessage.decode()
 
-        if clientMessage == "switchOn":
-            print(getTime() + "Switch turned on")
-            print(getTime() + "Light turned on")
-            sendMessage = "turnOn"
-            lightClient.send(sendMessage.encode())
-        elif clientMessage == "switchOff":
-            print(getTime() + "Switch turned off")
-            print(getTime() + "Light turned off")
-            sendMessage = "turnOff"
-            lightClient.send(sendMessage.encode())
-        elif clientMessage == "red":
-            print(getTime() + "Light turned to red")
-            sendMessage = "red"
-            lightClient.send(sendMessage.encode())
-        elif clientMessage == "blue":
-            print(getTime() + "Light turned to blue")
-            sendMessage = "blue"
-            lightClient.send(sendMessage.encode())
-        elif clientMessage == "green":
-            print(getTime() + "Light turned to green")
-            sendMessage = "green"
-            lightClient.send(sendMessage.encode())
-
+            if clientMessage == "switchOn":
+                sendMessage = "turnOn"
+                lightClient.send(sendMessage.encode())
+                print(getTime() + "Light turned on")
+            elif clientMessage == "switchOff":
+                sendMessage = "turnOff"
+                lightClient.send(sendMessage.encode())
+                print(getTime() + "Light turned off")
+            elif clientMessage == "red":
+                sendMessage = "red"
+                lightClient.send(sendMessage.encode())
+                print(getTime() + "Light turned to red")
+            elif clientMessage == "blue":
+                sendMessage = "blue"
+                lightClient.send(sendMessage.encode())
+                print(getTime() + "Light turned to blue")
+            elif clientMessage == "green":
+                sendMessage = "green"
+                lightClient.send(sendMessage.encode())
+                print(getTime() + "Light turned to green")
+            elif clientMessage == "purple":
+                sendMessage = "purple"
+                lightClient.send(sendMessage.encode())
+                print(getTime() + "Light turned to purple")
+            elif clientMessage == "yellow":
+                sendMessage = "yellow"
+                lightClient.send(sendMessage.encode())
+                print(getTime() + "Light turned to yellow")
+            elif clientMessage == "cyan":
+                sendMessage = "cyan"
+                lightClient.send(sendMessage.encode())
+                print(getTime() + "Light turned to cyan")
+            elif clientMessage == "white":
+                sendMessage = "white"
+                lightClient.send(sendMessage.encode())
+                print(getTime() + "Light turned to white")
+        except NameError:
+            pass
+        except ConnectionAbortedError:
+            sendMessage = "lightError"
+            userClient.send(sendMessage.encode())
+            print(getTime() + "Light disconnected")
+            sendMessage = ""
+        except ConnectionResetError:
+            if userMessageDisplayed == False:
+                print(getTime() + "User disconnected")
+                userMessageDisplayed = True
+            pass
 
 
 
@@ -100,31 +180,12 @@ if __name__ == "__main__":
     #Binding the server socket to the ip and port
     server.bind((ip,port))
 
-    #Getting the server to listen for a device to connect to it
-    server.listen(1)
-    client1, client1Address = server.accept()
-    deviceType = client1.recv(1024)
-    deviceType = deviceType.decode()
-    determineDeviceType(deviceType, client1, client1Address)
-
-
-    server.listen(1)
-    client2, client2Address = server.accept()
-    deviceType = client2.recv(1024)
-    deviceType = deviceType.decode()
-    determineDeviceType(deviceType, client2, client2Address)
-
-    server.listen(1)
-    client3, client3Address = server.accept()
-    deviceType = client3.recv(1024)
-    deviceType = deviceType.decode()
-    determineDeviceType(deviceType, client3, client3Address)
-
+    deviceListenThread = Thread(target=listenForDevice)
     switchThread = Thread(target=switchControl)
     userThread = Thread(target=userControl)
+    sendLightActiveThread = Thread(target=sendLightActive)
 
+    deviceListenThread.start()
     switchThread.start()
     userThread.start()
-
-    switchThread.join()
-    userThread.join()
+    sendLightActiveThread.start()
