@@ -23,34 +23,12 @@ def serverListen():
         serverMessage = serverMessage.decode()
 
 def rememberColour(colour):
-    global redColour
-    global blueColour
-    global greenColour
-    global purpleColour
-    global yellowColour
-    global cyanColour
-    global whiteColour
-    redColour = False
-    blueColour = False
-    greenColour = False
-    purpleColour = False
-    yellowColour = False
-    cyanColour = False
-    whiteColour = False
-    if colour == "red":
-        redColour = True
-    elif colour == "blue":
-        blueColour = True
-    elif colour == "green":
-        greenColour = True
-    elif colour == "purple":
-        purpleColour = True
-    elif colour == "yellow":
-        yellowColour = True
-    elif colour == "cyan":
-        cyanColour = True
-    elif colour == "white":
-        whiteColour = True
+    global lastColour
+    lastColour = colour
+
+def getLastColour():
+    global lastColour
+    return lastColour
 
 def lightSwitch(colour):
     print(getTime() + "Light switched to " + colour)
@@ -84,31 +62,13 @@ if __name__ == "__main__":
     serverListenThread = Thread(target=serverListen)
     serverListenThread.start()
 
-    redColour = False
-    blueColour = False
-    greenColour = False
-    purpleColour = False
-    yellowColour = False
-    cyanColour = False
-    whiteColour = True
+    global lastColour
+    lastColour = "white"
 
     while True:
         if serverMessage == "turnOn":
             print(getTime() + "Light turned on")
-            if redColour == True:
-                serverMessage = "red"
-            elif blueColour == True:
-                serverMessage = "blue"
-            elif greenColour == True:
-                serverMessage = "green"
-            elif purpleColour == True:
-                serverMessage = "purple"
-            elif yellowColour == True:
-                serverMessage = "yellow"
-            elif cyanColour == True:
-                serverMessage = "cyan"
-            elif whiteColour == True:
-                serverMessage = "white"
+            serverMessage = getLastColour()
         elif serverMessage == "turnOff":
             print(getTime() + "Light turned off")
             serverMessage = ""
