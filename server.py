@@ -155,31 +155,51 @@ def switchControl():
                 lightClientSendMessage("turnOn")
                 #Resetting the message received
                 clientMessage = ""
+            #Print that that the switch and the light have both been turned off
             elif clientMessage == "switchOff":
                 print(getTime() + "Switch turned off")
                 print(getTime() + "Light turned off")
+                #Send a message to the light to switch off
                 lightClientSendMessage("turnOff")
+                #Resetting the message received
                 clientMessage = ""
+        #This error may occur if the light client hasn't been initialised yet
         except NameError:
+            #If the error above occurrs then just pass
             pass
+        #This error may occur if the light client has disconnected
         except ConnectionResetError:
+            #Checking if the switch error message has been displayed yet
             if switchMessageDisplayed == False:
+                #If not then printing to the server that the switch has been disconnected
                 print(getTime() + "Switch disconnected")
+                #Changing the boolean so that the server knows it has already displayed the error message
                 switchMessageDisplayed = True
+            #If the error message has already been displayed then just pass
             pass
 
+#A function to get the inputs from the user and send the right outputs
 def userControl():
+    #Creating a global variable to store the message received
     global clientMessage
+    #Creating a global variable to store whether the user error message has been displayed
     global userMessageDisplayed
+    #Creating a main loop in which the user can be controlled
     while True:
         try:
+            #This time delay has been added so that if the user disconnects and then recoonects it doesn't display switch disconnected after it reconnecting
             time.sleep(0.1)
+            #Setting the client message and send message to blank
             clientMessage = ""
             sendMessage = ""
+            #Listening for the user to send a message
             clientMessage = userClient.recv(1024)
+            #Decoding the message received
             clientMessage = clientMessage.decode()
 
+            #Reacting to the messages received from the user
             if clientMessage == "switchOn":
+                #Sending a message to the light to turn on
                 lightClientSendMessage("turnOn")
                 print(getTime() + "Light turned on")
             elif clientMessage == "switchOff":
@@ -206,22 +226,33 @@ def userControl():
             elif clientMessage == "white":
                 lightClientSendMessage(clientMessage)
                 print(getTime() + "Light turned to white")
+        #This error may occur if the light client or user client hasn't been initialised yet
         except NameError:
+            #If this error occurs then just pass
             pass
+        #This error could occur if the light is disconnected
         except ConnectionAbortedError:
+            #Sending the user a message letting it know that the light is disconnected
             userClientSendMessage("lightError")
+            #Printing to the server that the light has been disconnected
             print(getTime() + "Light disconnected")
+            #Resetting the send message
             sendMessage = ""
-        except ConnectionResetError:
+        #This error could occur if the user has disconnected
+        except ConnectionResetError:#
+        #Checking if the user error message has been displayed yet
             if userMessageDisplayed == False:
+                #If not then printing to the server that the user has disconnected
                 print(getTime() + "User disconnected")
+                #Setting the boolean for the user error message displayed to true
                 userMessageDisplayed = True
+            #If it has already been displayed then just pass
             pass
 
 
-
+#Creating a main function to run the program
 if __name__ == "__main__":
-    #Asking the user to set up the server by typing in the ip. (USE "localhost" if you are running both programs on the same computer)
+    #Asking the user to set up the server by typing in the ip. (USE "localhost" if you are running the programs on the same computer)
     print("Input the server ip")
     #Getting the user input for the ip
     ip = input()
@@ -236,11 +267,16 @@ if __name__ == "__main__":
     #Binding the server socket to the ip and port
     server.bind((ip,port))
 
+    #Creating a thread to listen for new devices trying to connect
     deviceListenThread = Thread(target=listenForDevice)
+    #Creating a new thread to control the switch
     switchThread = Thread(target=switchControl)
+    #Creating a new thread to control the user
     userThread = Thread(target=userControl)
+    #Creating a new thread to constantly check if the light is still connected
     sendLightActiveThread = Thread(target=sendLightActive)
 
+    #Starting all the threads
     deviceListenThread.start()
     switchThread.start()
     userThread.start()
