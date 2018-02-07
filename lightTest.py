@@ -26,10 +26,6 @@ def rememberColour(colour):
     global lastColour
     lastColour = colour
 
-def getLastColour():
-    global lastColour
-    return lastColour
-
 def lightSwitch(colour):
     print(getTime() + "Light switched to " + colour)
     rememberColour(colour)
@@ -68,7 +64,7 @@ if __name__ == "__main__":
     while True:
         if serverMessage == "turnOn":
             print(getTime() + "Light turned on")
-            serverMessage = getLastColour()
+            serverMessage = lastColour
         elif serverMessage == "turnOff":
             print(getTime() + "Light turned off")
             serverMessage = ""
