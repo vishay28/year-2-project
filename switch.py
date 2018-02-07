@@ -1,4 +1,4 @@
-from data import *
+from generalFunctions import *
 
 
 #A function to send the server a message
