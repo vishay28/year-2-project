@@ -1,20 +1,5 @@
-#Imports the TCP socket package
-import socket
-#Imports a package to get the current date and time for timestamping
-import datetime
-#Imports the multithreading package
-from threading import Thread
-#Imports the time package
-import time
+from data import *
 
-#Creating a function to get the current date and time and formatting it
-def getTime():
-    #Converting the current date and time to a string
-    currentTime = str(datetime.datetime.now())
-    #Selecting only the information that we want to display
-    currentTime = (currentTime[0:19] + ": ")
-    #Returning the current date and time
-    return currentTime
 
 #A function to send the server a message
 def serverMessageSend(message):
