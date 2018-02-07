@@ -1,23 +1,9 @@
-#Imports the TCP socket package
-import socket
-#Imports a package to get the current date and time for timestamping
-import datetime
-#Importing the multithreading package
-from threading import Thread
-#Importing the time package
-import time
+from data import *
+#Importing the GPIO package
+import RPi.GPIO as GPIO
 
 #Setting the server message to blank
 serverMessage = ""
-
-#Creating a function to get the current date and time and formatting it
-def getTime():
-    #Converting the current date and time to a string
-    currentTime = str(datetime.datetime.now())
-    #Selecting only the information that we want to display
-    currentTime = (currentTime[0:19] + ": ")
-    #Returning the current date and time
-    return currentTime
 
 #A function to constantly listen for messages from the server
 def serverListen():
@@ -36,13 +22,6 @@ def rememberColour(colour):
     global lastColour
     #Assigning the variable to the last colour set
     lastColour = colour
-
-#A function that will return the last colour that was set
-def getLastColour():
-    #Creating a global variable of lastColour
-    global lastColour
-    #Returning the last colour that was set
-    return lastColour
 
 #A function to print the colour that the light has switched to and then sending it to the rememberColour method
 def lightSwitch(colour):
@@ -85,64 +64,30 @@ if __name__ == "__main__":
     #Setting the default last colour to white
     lastColour = "white"
 
+    #Setting the GPIO to board numbering
+    GPIO.setmode(GPIO.BOARD)
+    #Setting up the red output
+    GPIO.setup(3, GPIO.OUT)
+    #Setting up the blue output
+    GPIO.setup(5, GPIO.OUT)
+    #Setting up the green output
+    GPIO.setup(7, GPIO.OUT)
+
+    colourInputs = {"turnOff":[0,0,0],"red":[1,0,0], "blue":[0,1,0], "green":[0,0,1], "purple":[1,1,0], "yellow":[1,0,1], "cyan":[0,1,1], "white":[1,1,1]}
+
     #Creating a main loop in which the light will readct to the messages from the server
     while True:
         #Reacting to different messages sent from the server
         if serverMessage == "turnOn":
             print(getTime() + "Light turned on")
             #Getting the colour that was last set
-            serverMessage = getLastColour()
-        elif serverMessage == "turnOff":
-            print(getTime() + "Light turned off")
-            #GPIO pin 3 is red
-            GPIO.set(3, GPIO.LOW)
-            #GPIO pin 5, is blue
-            GPIO.set(5, GPIO.LOW)
-            #GPIO pin 7 is green
-            GPIO.set(7, GPIO.LOW)
-            serverMessage = ""
-        if serverMessage == "red":
-            GPIO.set(3, GPIO.HIGH)
-            GPIO.set(5, GPIO.LOW)
-            GPIO.set(7, GPIO.LOW)
+            serverMessage = lastColour
+        if serverMessage in colourInputs:
             #Calling the function to print to the light log and to set the remember colour
             lightSwitch(serverMessage)
-            serverMessage = ""
-        elif serverMessage == "blue":
-            GPIO.set(3, GPIO.LOW)
-            GPIO.set(5, GPIO.HIGH)
-            GPIO.set(7, GPIO.LOW)
-            lightSwitch(serverMessage)
-            serverMessage = ""
-        elif serverMessage == "green":
-            GPIO.set(3, GPIO.LOW)
-            GPIO.set(5, GPIO.LOW)
-            GPIO.set(7, GPIO.HIGH)
-            lightSwitch(serverMessage)
-            serverMessage = ""
-        elif serverMessage == "purple":
-            GPIO.set(3, GPIO.HIGH)
-            GPIO.set(5, GPIO.HIGH)
-            GPIO.set(7, GPIO.LOW)
-            lightSwitch(serverMessage)
-            serverMessage = ""
-        elif serverMessage == "yellow":
-            GPIO.set(3, GPIO.HIGH)
-            GPIO.set(5, GPIO.LOW)
-            GPIO.set(7, GPIO.HIGH)
-            lightSwitch(serverMessage)
-            serverMessage = ""
-        elif serverMessage == "cyan":
-            GPIO.set(3, GPIO.LOW)
-            GPIO.set(5, GPIO.HIGH)
-            GPIO.set(7, GPIO.HIGH)
-            lightSwitch(serverMessage)
-            serverMessage = ""
-        elif serverMessage == "white":
-            GPIO.set(3, GPIO.HIGH)
-            GPIO.set(5, GPIO.HIGH)
-            GPIO.set(7, GPIO.HIGH)
-            lightSwitch(serverMessage)
-            serverMessage = ""
+            GPIO.set(3, colourInputs[serverMessage][0])
+            GPIO.set(5, colourInputs[serverMessage][1])
+            GPIO.set(7, colourInputs[serverMessage][2])
+            serverMessage=""
 
     serverListenThread.join()
