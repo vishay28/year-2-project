@@ -1,23 +1,7 @@
-#Imports the TCP socket package
-import socket
-#Imports a package to get the current date and time for timestamping
-import datetime
-#Imports the time package
-import time
-#Imports the threading package for multithreading
-from threading import Thread
+from data import *
 
 #Setting the client message to blank
 clientMessage = ""
-
-#Creating a function to get the current date and time and formatting it
-def getTime():
-    #Converting the current date and time to a string
-    currentTime = str(datetime.datetime.now())
-    #Selecting only the information that we want to display
-    currentTime = (currentTime[0:19] + ": ")
-    #Returning the current date and time
-    return currentTime
 
 #A function to send messages to the light client
 def lightClientSendMessage(message):
@@ -230,16 +214,7 @@ def userControl():
         except NameError:
             #If this error occurs then just pass
             pass
-        #This error could occur if the light is disconnected
-        except ConnectionAbortedError:
-            #Sending the user a message letting it know that the light is disconnected
-            userClientSendMessage("lightError")
-            #Printing to the server that the light has been disconnected
-            print(getTime() + "Light disconnected")
-            #Resetting the send message
-            sendMessage = ""
-        #This error could occur if the user has disconnected
-        except ConnectionResetError:#
+        except ConnectionResetError:
         #Checking if the user error message has been displayed yet
             if userMessageDisplayed == False:
                 #If not then printing to the server that the user has disconnected
