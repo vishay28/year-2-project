@@ -1,4 +1,4 @@
-from data import *
+from generalFunctions import *
 #Importing the GPIO package
 import RPi.GPIO as GPIO
 
@@ -25,8 +25,12 @@ def rememberColour(colour):
 
 #A function to print the colour that the light has switched to and then sending it to the rememberColour method
 def lightSwitch(colour):
-    print(getTime() + "Light switched to " + colour)
-    rememberColour(colour)
+    if colour == "turnOff":
+        print(getTime() + "Light switched off")
+    else:
+        print(getTime() + "Light switched to " + colour)
+    if colour != "turnOff":
+        rememberColour(colour)
 
 
 #Creating a main method in which to run the program
@@ -72,8 +76,6 @@ if __name__ == "__main__":
     GPIO.setup(5, GPIO.OUT)
     #Setting up the green output
     GPIO.setup(7, GPIO.OUT)
-
-    colourInputs = {"turnOff":[0,0,0],"red":[1,0,0], "blue":[0,1,0], "green":[0,0,1], "purple":[1,1,0], "yellow":[1,0,1], "cyan":[0,1,1], "white":[1,1,1]}
 
     #Creating a main loop in which the light will readct to the messages from the server
     while True:
