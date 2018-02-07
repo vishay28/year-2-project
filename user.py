@@ -1,23 +1,9 @@
-#Imports the TCP socket package
-import socket
-#Imports a package to get the current date and time for timestamping
-import datetime
-#Imports a package to do multithreading
-from threading import Thread
-#Imports the time package
-import time
+from data import *
 
-#Creating a function to get the current date and time and formatting it
-def getTime():
-    #Converting the current date and time to a string
-    currentTime = str(datetime.datetime.now())
-    #Selecting only the information that we want to display
-    currentTime = (currentTime[0:19] + ": ")
-    #Returning the current date and time
-    return currentTime
 
 #A function that will constantly listen for messages being sent by the server
 def serverListen():
+    global lightConnected
     while True:
         #Listening for a message from the server
         serverMessage = server.recv(1024)
@@ -26,9 +12,13 @@ def serverListen():
         #Readting to different messages received from the server
         if serverMessage == "lightError":
             print(getTime() + "Light disconnected")
+            #Setting the value of light connected to false
+            lightConnected = False
             serverMessage = ""
         elif serverMessage == "lightConnected":
             print(getTime() + "Light connected")
+            #Setting the value of light connected to true
+            lightConnected = True
             serverMessage = ""
 #A function to send the server a message
 def serverMessageSend(message):
@@ -64,6 +54,11 @@ if __name__ == "__main__":
     clientID = "user"
     serverMessageSend(clientID)
 
+    #Defining a global variable to determine whether the light is connected or not
+    global lightConnected
+    #Setting the default value to true
+    lightConnected = True
+
     #Creating a main loop in whcih the user can send messages to the server
     while True:
         #Resetting the user input
@@ -71,21 +66,12 @@ if __name__ == "__main__":
         #Getting the user input
         userInput = input()
         #Depending on what the user types different messages will be sent to the server
-        if userInput == "on":
+        #If the light is disconnected then don't allow the user to send a message to the server
+        if lightConnected == False:
+            print("Light disconnected")
+        elif userInput == "on":
             serverMessageSend("switchOn")
         elif userInput == "off":
             serverMessageSend("switchOff")
-        elif userInput == "red":
-            serverMessageSend(userInput)
-        elif userInput == "blue":
-            serverMessageSend(userInput)
-        elif userInput == "green":
-            serverMessageSend(userInput)
-        elif userInput == "purple":
-            serverMessageSend(userInput)
-        elif userInput == "yellow":
-            serverMessageSend(userInput)
-        elif userInput == "cyan":
-            serverMessageSend(userInput)
-        elif userInput == "white":
-            serverMessageSend(userInput)
+        elif userInput in colourInputs:
+            serverMessage(userInput)
