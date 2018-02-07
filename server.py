@@ -1,4 +1,4 @@
-from data import *
+from generalFunctions import *
 
 #Setting the client message to blank
 clientMessage = ""
@@ -189,27 +189,8 @@ def userControl():
             elif clientMessage == "switchOff":
                 lightClientSendMessage("turnOff")
                 print(getTime() + "Light turned off")
-            elif clientMessage == "red":
+            elif clientMessage in colourInputs:
                 lightClientSendMessage(clientMessage)
-                print(getTime() + "Light turned to red")
-            elif clientMessage == "blue":
-                lightClientSendMessage(clientMessage)
-                print(getTime() + "Light turned to blue")
-            elif clientMessage == "green":
-                lightClientSendMessage(clientMessage)
-                print(getTime() + "Light turned to green")
-            elif clientMessage == "purple":
-                lightClientSendMessage(clientMessage)
-                print(getTime() + "Light turned to purple")
-            elif clientMessage == "yellow":
-                lightClientSendMessage(clientMessage)
-                print(getTime() + "Light turned to yellow")
-            elif clientMessage == "cyan":
-                lightClientSendMessage(clientMessage)
-                print(getTime() + "Light turned to cyan")
-            elif clientMessage == "white":
-                lightClientSendMessage(clientMessage)
-                print(getTime() + "Light turned to white")
         #This error may occur if the light client or user client hasn't been initialised yet
         except NameError:
             #If this error occurs then just pass
