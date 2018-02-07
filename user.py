@@ -1,4 +1,4 @@
-from data import *
+from generalFunctions import *
 
 
 #A function that will constantly listen for messages being sent by the server
@@ -74,4 +74,4 @@ if __name__ == "__main__":
         elif userInput == "off":
             serverMessageSend("switchOff")
         elif userInput in colourInputs:
-            serverMessage(userInput)
+            serverMessageSend(userInput)
