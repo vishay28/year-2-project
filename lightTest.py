@@ -1,4 +1,4 @@
-from data import *
+from generalFunctions import *
 
 #Setting the server message to blank
 serverMessage = ""
@@ -23,8 +23,12 @@ def rememberColour(colour):
 
 #A function to print the colour that the light has switched to and then sending it to the rememberColour method
 def lightSwitch(colour):
-    print(getTime() + "Light switched to " + colour)
-    rememberColour(colour)
+    if colour == "turnOff":
+        print(getTime() + "Light switched off")
+    else:
+        print(getTime() + "Light switched to " + colour)
+    if colour != "turnOff":
+        rememberColour(colour)
 
 
 #Creating a main method in which to run the program
