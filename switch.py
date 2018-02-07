@@ -9,24 +9,7 @@ def serverMessageSend(message):
 
 #A main method to run the program
 if __name__ == "__main__":
-    #Asking the user to input the ip of the server it is trying to connect to. (USE "localhost" if you are running the programs on the same computer)
-    print("Input the server ip")
-    #Getting the user input for the ip
-    ip = input()
-
-    #Asking the user to input the port of the server it is trying to connect to
-    print("Input the port")
-    #Getting the user input for the port and then coverting it to an integer
-    port = int(input())
-
-    #Creatign a socket for the client to connect to the server
-    server = socket.socket()
-
-    #Trying to connect to the server using the ip and port specified by the user
-    server.connect((ip,port))
-
-    #Once successfully connected it prints a log of the date and time and the ip it has connected to
-    print(getTime() + "Connected to " + ip)
+    server = connectToServer()
 
     #Setting the client ID and sending it to the server
     clientID = "switch"
