@@ -70,9 +70,9 @@ if __name__ == "__main__":
         if serverMessage in colourInputs:
             #Calling the function to print to the light log and to set the remember colour
             lightSwitch(serverMessage)
-            GPIO.set(3, colourInputs[serverMessage][0])
-            GPIO.set(5, colourInputs[serverMessage][1])
-            GPIO.set(7, colourInputs[serverMessage][2])
+            GPIO.output(3, colourInputs[serverMessage][0])
+            GPIO.output(5, colourInputs[serverMessage][1])
+            GPIO.output(7, colourInputs[serverMessage][2])
             serverMessage=""
 
     serverListenThread.join()
