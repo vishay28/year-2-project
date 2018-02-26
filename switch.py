@@ -6,7 +6,6 @@ def serverMessageSend(message):
     #Sending the message to the server
     server.send(message.encode())
 
-
 #A main method to run the program
 if __name__ == "__main__":
     server = connectToServer()
