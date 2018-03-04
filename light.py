@@ -35,6 +35,8 @@ def lightSwitch(colour):
 
 #Creating a main method in which to run the program
 if __name__ == "__main__":
+    time.sleep(10)
+    print(getTime() + "Light initiated")
     server = connectToServer()
 
     #Setting the client ID and sending it to the server
