@@ -13,11 +13,11 @@ def lightCheck():
 
     #Creating a main loop in whcih the user can send messages to the server
     while True:
-        lightsDict = devicesDB.lights.find({})
+        lightsDict = devicesDB.lightBulb.find({})
         try:
             for document in lightsDict:
                 time.sleep(1)
-                RGBValues = devicesDB.lights.find_one({"id": document["id"]})
+                RGBValues = devicesDB.lightBulb.find_one({"ident": document["ident"]})
                 r = RGBValues["r"]
                 g = RGBValues["g"]
                 b = RGBValues["b"]
@@ -37,33 +37,34 @@ def lightCheck():
                     userInput = "yellow"
                 elif ((r==1) and (g==1) and (b==1)):
                     userInput = "white"
-                serverMessageSend(document["id"])
+                serverMessageSend(document["ident"])
                 serverMessageSend(userInput)
         except TypeError:
             pass
 
 def plugCheck():
     while True:
-        plugsDict = devicesDB.plugs.find({})
+        plugsDict = devicesDB.plug.find({})
         try:
             for document in plugsDict:
                 time.sleep(1)
-                plugsData = devicesDB.plugs.find_one({"id": document["id"]})
+                plugsData = devicesDB.plug.find_one({"ident": document["ident"]})
                 state = plugsData["state"]
                 if state:
                     userInput = "turnOn"
                 elif not state:
                     userInput = "turnOff"
-                serverMessageSend(document["id"])
+                serverMessageSend(document["ident"])
                 serverMessageSend(userInput)
         except TypeError:
             pass
 
 #Creating a main method in which to run the program
 if __name__ == "__main__":
+    print(getTime() + "User initiated")
     server = connectToServer()
     dbClient = pymongo.MongoClient("localhost", 27017)
-    devicesDB = dbClient.devices
+    devicesDB = dbClient.weblightDatabase
 
     #Setting the client ID and sending it to the server
     clientID = "user"
