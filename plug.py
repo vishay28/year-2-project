@@ -1,11 +1,8 @@
-#Imports the TCP socket package
-import socket
-#Imports a package to get the current date and time for timestamping
-import datetime
-from threading import Thread
-import time
+#Imports the general file which contains various functions and variables which are used by multiple programs
+from generalFunctions import *
+#Importing the GPIO package
 import RPi.GPIO as GPIO
-
+#Setting the server message to blank
 serverMessage = ""
 
 #Creating a function to get the current date and time and formatting it
@@ -17,49 +14,56 @@ def getTime():
     #Returning the current date and time
     return currentTime
 
+#A function to listen for an incomming message from the server
 def serverListen():
+    #Defning the global variable for the server message
     global serverMessage
+    #Creating a main loop to listen for server messages
     while True:
+        #Listening for a message from the server
         serverMessage = server.recv(1024)
+        #Decoding the message received by the server
         serverMessage = serverMessage.decode()
 
 
-
+#Creating a main method in which to run the program
 if __name__ == "__main__":
+    time.sleep(10)
+    print(getTime() + "Plug initiated")
+    #Setting up the GPIO pins to be in board mode
     GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(3, GPIO.OUT, initial=GPIO.LOW)
-    #Asking the user to input the ip of the server it is trying to connect to. (USE "localhost" if you are running both programs on the same computer)
-    print("Input the server ip")
-    #Getting the user input for the ip
-    ip = input()
+    #Setting up the set pin
+    GPIO.setup(3, GPIO.OUT)
+    #Setting up the reset pin
+    GPIO.setup(5, GPIO.OUT)
 
-    #Asking the user to input the port of the server it is trying to connect to
-    print("Input the port")
-    #Getting the user input for the port and then coverting it to an integer
-    port = int(input())
+    #Connecting to the server
+    server = connectToServer()
 
-    #Creatign a socket for the client to connect to the server
-    server = socket.socket()
-
-    #Trying to connect to the server using the ip and port specified by the user
-    server.connect((ip,port))
-
-    #Once successfully connected it prints a log of the date and time and the ip it has connected to
-    print(getTime() + "Connected to " + ip)
-
+    #Defining the client ID
     clientID = "plug"
+    #Letting the server know that a plug has connected
     server.send(clientID.encode())
 
+    #Creating a thread to listen for messages from the server
     serverListenThread = Thread(target=serverListen)
+    #Starting the thread
     serverListenThread.start()
 
+    #Creating a main loop in which to run the program
     while True:
+        #Checking what the server message is and responding accordingly
         if serverMessage == "turnOn":
             print(getTime() + "Plug turned on")
+            #Pulsing the set pin
             GPIO.output(3, GPIO.HIGH)
+            time.sleep(1)
+            GPIO.output(3, GPIO.LOW)
             serverMessage = ""
         elif serverMessage == "turnOff":
             print(getTime() + "Plug turned off")
-            GPIO.output(3, GPIO.LOW)
+            #Pulsing the reset pin
+            GPIO.output(5, GPIO.HIGH)
+            time.sleep(1)
+            GPIO.output(5, GPIO.LOW)
             serverMessage = ""
-    serverListenThread.join()
