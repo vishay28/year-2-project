@@ -14,13 +14,9 @@ def getTime():
 
 def connectToServer():
     #Asking the user to input the ip of the server it is trying to connect to. (USE "localhost" if you are running the programs on the same computer)
-    print("Input the server ip")
-    #Getting the user input for the ip
-    ip = input()
-    #Asking the user to input the port of the server it is trying to connect to
-    print("Input the port")
+    ip = "192.168.0.10"
     #Getting the user input for the port and then coverting it to an integer
-    port = int(input())
+    port = 5005
     #Creatign a socket for the client to connect to the server
     server = socket.socket()
     #Trying to connect to the server using the ip and port specified by the user
