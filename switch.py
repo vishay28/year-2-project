@@ -1,3 +1,5 @@
+#This program control the switch smart deivce
+
 #Imports the general file which contains various functions and variables which are used by multiple programs
 from generalFunctions import *
 #Importing the GPIO package
@@ -22,6 +24,7 @@ def serverListen():
 
 #A main method to run the program
 if __name__ == "__main__":
+    #This waiting period has been introduced to ensure the Raspberry PI connects to the wifi before trying to connect to the server
     time.sleep(10)
     print(getTime() + "Switch initiated")
     #Setting up the GPIO pins to board mode
