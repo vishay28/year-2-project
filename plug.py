@@ -1,3 +1,5 @@
+#This program controls the smart plug device
+
 #Imports the general file which contains various functions and variables which are used by multiple programs
 from generalFunctions import *
 #Importing the GPIO package
@@ -28,6 +30,7 @@ def serverListen():
 
 #Creating a main method in which to run the program
 if __name__ == "__main__":
+    #This waiting period has been introduced to ensure the Raspberry PI connects to the wifi before trying to connect to the server
     time.sleep(10)
     print(getTime() + "Plug initiated")
     #Setting up the GPIO pins to be in board mode
