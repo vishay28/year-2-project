@@ -1,3 +1,5 @@
+#This program controls all the smart devices
+
 #Imports the general file which contains various functions and variables which are used by multiple programs
 from generalFunctions import *
 #Imports the pymongo package which allows python to interact with the mongoDB database
@@ -36,7 +38,7 @@ def timeCheck():
                     documentData = devicesDB.lightBulb.find_one({"ident": document["ident"]})
 
                     #Assigning an array to the the times that the user wants to turn the light on
-                    onTimeArray = documentData["onTime"]
+                    onTimeArray = documentData["onTimes"]
                     #For each element in the array
                     for onTime in onTimeArray:
                         #Get the current time
@@ -45,11 +47,12 @@ def timeCheck():
                         #If the current time is equal to the element within the array
                         if onTime == currentTime:
                             #Set that light to on
-                            lightsCollection.update_one({'ident': document["ident"]}, {'$set': {'r': 1}})
-                            lightsCollection.update_one({'ident': document["ident"]}, {'$set': {'g': 1}})
-                            lightsCollection.update_one({'ident': document["ident"]}, {'$set': {'b': 1}})
+                            lightsCollection.update_one({'ident': document["ident"]}, {'$set': {'r': 255}})
+                            lightsCollection.update_one({'ident': document["ident"]}, {'$set': {'g': 255}})
+                            lightsCollection.update_one({'ident': document["ident"]}, {'$set': {'b': 255}})
 
-                    offTimeArray = documentData["offTime"]
+                    #Sane as above just for off times instead
+                    offTimeArray = documentData["offTimes"]
                     for offTime in offTimeArray:
                         currentTime = str(datetime.datetime.now())
                         currentTime = (currentTime[11:16])
@@ -58,18 +61,19 @@ def timeCheck():
                             lightsCollection.update_one({'ident': document["ident"]}, {'$set': {'g': 0}})
                             lightsCollection.update_one({'ident': document["ident"]}, {'$set': {'b': 0}})
 
+                #Same as above just for plugs instead
                 plugsDict = devicesDB.plug.find({})
                 for document in plugsDict:
                     documentData = devicesDB.plug.find_one({"ident": document["ident"]})
 
-                    onTimeArray = documentData["onTime"]
+                    onTimeArray = documentData["onTimes"]
                     for onTime in onTimeArray:
                         currentTime = str(datetime.datetime.now())
                         currentTime = (currentTime[11:16])
                         if onTime == currentTime:
                             plugsCollection.update_one({'ident': document["ident"]}, {'$set': {'state': 1}})
 
-                    offTimeArray = documentData["offTime"]
+                    offTimeArray = documentData["offTimes"]
                     for offTime in offTimeArray:
                         currentTime = str(datetime.datetime.now())
                         currentTime = (currentTime[11:16])
@@ -135,7 +139,7 @@ def determineDeviceType(clientID, client, clientAddress):
         #Assigning a variable to the lightBulb collection in the database
         lightCollection = devicesDB.lightBulb
         #Creating a document within the database with the light's data
-        document = {"ident": clientName,"name": clientName, "r": 0, "g": 0, "b": 0, "onTime": [], "offTime": [],}
+        document = {"ident": clientName,"name": clientName, "r": 0, "g": 0, "b": 0, "onTimes": [], "offTimes": [],}
         #Inserting the document into the database
         lightCollection.insert_one(document)
         #Printing to the server the name and address of the device that has connected
@@ -157,7 +161,7 @@ def determineDeviceType(clientID, client, clientAddress):
         #Assigning a variable to the plug collection in the database
         plugCollection = devicesDB.plug
         #Creating a document within the database with the plug's data
-        document = {"ident": clientName,"name": clientName, "state": 0, "onTime": [], "offTime": [],}
+        document = {"ident": clientName,"name": clientName, "state": 0, "onTimes": [], "offTimes": [],}
         #Inserting the document into the database
         plugCollection.insert_one(document)
         #Printing to the server the name and address of the device that has connected
@@ -201,9 +205,9 @@ def switchControl(name):
                 if "plug" in slaveID:
                     plugsCollection.update_one({'ident': slaveID}, {'$set': {'state': 1}})
                 elif "light" in slaveID:
-                    lightsCollection.update_one({'ident': slaveID}, {'$set': {'r': 1}})
-                    lightsCollection.update_one({'ident': slaveID}, {'$set': {'g': 1}})
-                    lightsCollection.update_one({'ident': slaveID}, {'$set': {'b': 1}})
+                    lightsCollection.update_one({'ident': slaveID}, {'$set': {'r': 255}})
+                    lightsCollection.update_one({'ident': slaveID}, {'$set': {'g': 255}})
+                    lightsCollection.update_one({'ident': slaveID}, {'$set': {'b': 255}})
                 #Print the slaveid and that it was turned on
                 print(getTime() + slaveID + " turned on")
                 #Resetting the message received
@@ -255,9 +259,9 @@ def lightClientSendMessage(deviceid, message):
                 deviceClient[deviceid].send(message.encode())
                 #Determining what the message was and then updating the database accordingly
                 if message == "turnOn":
-                    lightsCollection.update_one({'ident': deviceid}, {'$set': {'r': 1}})
-                    lightsCollection.update_one({'ident': deviceid}, {'$set': {'g': 1}})
-                    lightsCollection.update_one({'ident': deviceid}, {'$set': {'b': 1}})
+                    lightsCollection.update_one({'ident': deviceid}, {'$set': {'r': 255}})
+                    lightsCollection.update_one({'ident': deviceid}, {'$set': {'g': 255}})
+                    lightsCollection.update_one({'ident': deviceid}, {'$set': {'b': 255}})
                     #Printing to the server the ID of the light and that it was turned on
                     print(getTime() + deviceid + " turned on")
                 elif message == "turnOff":
@@ -290,9 +294,11 @@ def plugSendMessage(deviceid, message):
             if message == "turnOn":
                 #Updating the document in the database
                 plugsCollection.update_one({'ident': deviceid}, {'$set': {'state': 1}})
+                print(getTime() + deviceid + " turned on")
             elif message == "turnOff":
                 #Updating the document in the database
                 plugsCollection.update_one({'ident': deviceid}, {'$set': {'state': 0}})
+                print(getTime() + deviceid + " turned off")
         #This error will occur if the plug disconnects
         except (ConnectionResetError, ConnectionAbortedError):
             #Printing to the server which plug was disconnected
